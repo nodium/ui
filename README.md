@@ -1,2 +1,6 @@
-# neo4j
-Contains the Nodium Neo4j API and data transformer
+# Nodium UI
+This package contains optional UI components for Nodium
+
+## Authors
+Niko van Meurs
+Sid Mijnders
