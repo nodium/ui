@@ -71,7 +71,7 @@ module.exports = function (Nodium, $, undefined) {
 
             var element = util.createFromPrototype(this.$list, data);
 
-            return $(element).NodiumendTo(this.$list);
+            return $(element).appendTo(this.$list);
         },
 
         /**

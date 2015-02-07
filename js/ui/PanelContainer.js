@@ -103,7 +103,7 @@ module.exports = function (Nodium, $, undefined) {
                 icon: icon
             });
 
-            menu.Nodiumend(menuItem);
+            menu.append(menuItem);
         },
 
         /**

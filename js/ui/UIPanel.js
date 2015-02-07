@@ -11,7 +11,7 @@
  * @author Niko van Meurs <nikovanmeurs@gmail.com>
  * @author Sid Mijnders
  */
-module.exports = function (Nodium, undefined) {
+module.exports = function (Nodium, $, undefined) {
 
 'use strict';
 

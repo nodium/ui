@@ -19,7 +19,7 @@ module.exports = function (Nodium, undefined) {
 
     Nodium.ui   = Nodium.ui || {};
 
-    require('./ui/UIElement')(Nodium);
+    require('./ui/UIElement')(Nodium, jQuery);
     require('./ui/UIPanel')(Nodium, jQuery);
     require('./ui/PanelContainer')(Nodium, jQuery);
     require('./ui/List')(Nodium, jQuery);

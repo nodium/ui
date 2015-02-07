@@ -143,7 +143,7 @@ module.exports = function (Nodium, $, _, undefined) {
                 rows: 1
             });
 
-            $('input', $(fieldHTML).NodiumendTo(propertiesList)).focus();
+            $('input', $(fieldHTML).appendTo(propertiesList)).focus();
         },
 
         createListElement: function (selector, data) {
@@ -153,7 +153,7 @@ module.exports = function (Nodium, $, _, undefined) {
 
             fieldHTML = util.createFromPrototype(elementList, data);
 
-            $('input', $(fieldHTML).NodiumendTo(elementList)).focus();
+            $('input', $(fieldHTML).appendTo(elementList)).focus();
         },
 
         createListElements: function (selector, data) {
@@ -173,7 +173,7 @@ module.exports = function (Nodium, $, _, undefined) {
                     label: data[i]
                 });
 
-                elementList.Nodiumend(elementHTML);
+                elementList.append(elementHTML);
             }
         },
 
@@ -337,7 +337,7 @@ module.exports = function (Nodium, $, _, undefined) {
                     rows: 1
                 });
 
-                propertiesList.Nodiumend(fieldHTML);
+                propertiesList.append(fieldHTML);
             }
 
             this.createListElements('#node-labels', data._labels);
@@ -564,7 +564,7 @@ module.exports = function (Nodium, $, undefined) {
 
             var element = util.createFromPrototype(this.$list, data);
 
-            return $(element).NodiumendTo(this.$list);
+            return $(element).appendTo(this.$list);
         },
 
         /**
@@ -1514,7 +1514,7 @@ module.exports = function (Nodium, $, undefined) {
                 icon: icon
             });
 
-            menu.Nodiumend(menuItem);
+            menu.append(menuItem);
         },
 
         /**
