@@ -17,6 +17,9 @@ module.exports = function (Nodium, undefined) {
 
     var ui          = Nodium.ui;
 
+    /**
+     * @constructor
+     */
     ui.UIPanel = Nodium.createClass(ui.UIElement, {
 
         destroy: function () {

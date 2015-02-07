@@ -13,8 +13,9 @@
  */
 module.exports = function (Nodium, undefined) {
 
-    var jQuery = require('jquery'),
-        _      = require('lodash');
+    var context = Nodium.context,
+        jQuery  = context.jQuery,
+        _       = context._;
 
     require('./ui/UIElement')(Nodium);
     require('./ui/UIPanel')(Nodium, jQuery);
