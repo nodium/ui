@@ -32,13 +32,13 @@ gulp.task('build', function () {
 
     return stream
         .pipe(source('./dist/wrapper.js'))
-        .pipe(rename('nodium-neo4j.js'))
+        .pipe(rename('nodium-ui.js'))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('minify', function () {
 
-    return gulp.src('./dist/nodium-neo4j.js')
+    return gulp.src('./dist/nodium-ui.js')
         .pipe(uglify())
         .pipe(rename({
             suffix: '.min'

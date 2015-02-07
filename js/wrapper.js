@@ -11,12 +11,10 @@
  * @author Niko van Meurs <nikovanmeurs@gmail.com>
  * @author Sid Mijnders
  */
- (function (context) {
+ (function (window, undefined) {
 
     'use strict';
 
-    var Nodium = context.Nodium;
-    // var Nodium = context.Nodium || require('nodium');
-        
-    require('./nodium-ui')(Nodium);
-}(this));
+    require('./nodium-ui')(window.Nodium);
+
+}(window));
