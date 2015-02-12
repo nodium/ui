@@ -15,10 +15,14 @@ module.exports = function (Nodium, undefined) {
 
     var context = Nodium.context,
         jQuery  = context.jQuery,
-        _       = context._;
+        _       = context._,
+        mercury = require('mercury');
 
     Nodium.ui   = Nodium.ui || {};
 
+    require('./util/renderComponent')(Nodium);
+    require('./util/classSet')(Nodium);
+    require('./util/createView')(Nodium);
     require('./ui/UIElement')(Nodium, jQuery);
     require('./ui/UIPanel')(Nodium, jQuery);
     require('./ui/PanelContainer')(Nodium, jQuery);

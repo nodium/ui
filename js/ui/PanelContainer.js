@@ -15,131 +15,176 @@ module.exports = function (Nodium, $, undefined) {
 
     'use strict';
 
-    var ui          = Nodium.ui,
-        util        = Nodium.util,
-        _defaults   = {
-            expanded: false
-        };
+    // var ui          = Nodium.ui,
+    //     util        = Nodium.util,
+    //     _defaults   = {
+    //         expanded: false
+    //     };
 
-    ui.PanelContainer = Nodium.createClass({
+    var ui      = Nodium.ui,
+        dom     = require('mercury').h,
+        value   = require('mercury').value;
 
-        construct: function (selector, options) {
+    ui.PanelContainer = Nodium.createView({
 
-            this.options = $.extend({}, _defaults, options);
-            this.view = $(selector);
-            this.panels = {};
-            this.isExpanded = this.options.expanded;
-
-            $(window).on('keydown', this.handleKeyDown.bind(this));
-
-            $(this.view)
-                .on('panel-show', '.panel', this.handlePanelShow.bind(this))
-                .on('panel-hide', '.panel', this.handlePanelHide.bind(this));
-
-            $('.panel-navigation', this.view)
-                .on('click', 'button', this.handleMenuButtonClicked.bind(this));
-
-            return this;
-        },
-
-        destroy: function () {
-
-        },
-
-        addPanel: function (panel) {
-
-            this.createMenuItem(panel.icon);
-            this.panels[panel.icon] = panel;
-
-            panel.init(this);
-
-            return this;
-        },
-
-        removePanel: function (panel) {
-            var index = this.panels.indexOf(panel);
-
-            if (index === -1) {
-                throw new Error('Could not remove panel.');
-                return;
+        getInitialState: function () {
+            return {
+                expandedPanel: value(undefined),
+                panels:        value([])
             }
-
-            this.panels.splice(index, 1);
-            $('.panel-navigation .' + panel.icon, this.view).remove();
-
-            panel.destroy();
-
-            return this;
         },
 
-        expand: function (icon) {
-            // $(this).trigger('expand', []);
-            this.visiblePanel = icon;
-            this.panels[icon].show();
+        render: function (state) {
 
-            if (!this.isExpanded) {
-                this.view.addClass('expanded');
-            }
+            var currentPanel,
+                cx;
 
-            this.isExpanded = true;
-        },
+            console.log(state);
 
-        collapse: function () {
+            currentPanel = state.currentPanel;
 
-            if (this.isExpanded) {
-                this.view.removeClass('expanded');
-                $(this).trigger('menu-collapse');
-            }
-
-            this.isExpanded = false;
-        },
-
-        createMenuItem: function (icon) {
-
-            var menu = $('.panel-navigation', this.view),
-                menuItem;
-
-            menuItem = util.createFromPrototype(menu, {
-                icon: icon
+            cx = Nodium.classSet({
+                'panelContainer':           true,
+                'panelContainer--floating': true,
+                'panelContainer--right':    true,
+                'menu':                     true,
+                'is-expanded':              null != currentPanel,
+                'is-collapsed':             null == currentPanel
             });
 
-            menu.append(menuItem);
+            return dom('div', {
+                    className: cx
+                },
+                state.panels.map(function (Panel) {
+
+                    var panelState = Panel({
+                        isActive: Panel.title === state.expandedPanel
+                    });
+
+                    return Panel.render(panelState);
+                })
+            );
         },
 
-        /**
-         * Event Handlers
-         */
+    // ui.PanelContainer = Nodium.createClass({
 
-        handleKeyDown: function (event) {
+        // construct: function (selector, options) {
 
-            if (event.keyCode === 27) {
-                this.collapse();
-            }
-        },
+        //     this.options = $.extend({}, _defaults, options);
+        //     this.view = $(selector);
+        //     this.panels = {};
+        //     this.isExpanded = this.options.expanded;
 
-        handleMenuButtonClicked: function (event) {
+        //     $(window).on('keydown', this.handleKeyDown.bind(this));
 
-            this.expand(event.currentTarget.className);
-        },
+        //     $(this.view)
+        //         .on('panel-show', '.panel', this.handlePanelShow.bind(this))
+        //         .on('panel-hide', '.panel', this.handlePanelHide.bind(this));
 
-        handlePanelShow: function (event, panel) {
+        //     $('.panel-navigation', this.view)
+        //         .on('click', 'button', this.handleMenuButtonClicked.bind(this));
 
-            if (!this.isExpanded) {
-                this.expand(panel.icon);
-                // this.panels[this.visiblePanel].hide();
-            }
+        //     return this;
+        // },
 
-            // this.expand(panel.icon);
-        },
+        // destroy: function () {
 
-        handlePanelHide: function (event, panel) {
+        // },
 
-            if (this.isExpanded) {
-                this.collapse();
-                // this.panels[this.visiblePanel].hide();
-            }
+        // addPanel: function (panel) {
 
-            // this.expand(panel.icon);
-        }
+        //     this.createMenuItem(panel.icon);
+        //     this.panels[panel.icon] = panel;
+
+        //     panel.init(this);
+
+        //     return this;
+        // },
+
+        // removePanel: function (panel) {
+        //     var index = this.panels.indexOf(panel);
+
+        //     if (index === -1) {
+        //         throw new Error('Could not remove panel.');
+        //         return;
+        //     }
+
+        //     this.panels.splice(index, 1);
+        //     $('.panel-navigation .' + panel.icon, this.view).remove();
+
+        //     panel.destroy();
+
+        //     return this;
+        // },
+
+        // expand: function (icon) {
+        //     // $(this).trigger('expand', []);
+        //     this.visiblePanel = icon;
+        //     this.panels[icon].show();
+
+        //     if (!this.isExpanded) {
+        //         this.view.addClass('expanded');
+        //     }
+
+        //     this.isExpanded = true;
+        // },
+
+        // collapse: function () {
+
+        //     if (this.isExpanded) {
+        //         this.view.removeClass('expanded');
+        //         $(this).trigger('menu-collapse');
+        //     }
+
+        //     this.isExpanded = false;
+        // },
+
+        // createMenuItem: function (icon) {
+
+        //     var menu = $('.panel-navigation', this.view),
+        //         menuItem;
+
+        //     menuItem = util.createFromPrototype(menu, {
+        //         icon: icon
+        //     });
+
+        //     menu.append(menuItem);
+        // },
+
+        // /**
+        //  * Event Handlers
+        //  */
+
+        // handleKeyDown: function (event) {
+
+        //     if (event.keyCode === 27) {
+        //         this.collapse();
+        //     }
+        // },
+
+        // handleMenuButtonClicked: function (event) {
+
+        //     this.expand(event.currentTarget.className);
+        // },
+
+        // handlePanelShow: function (event, panel) {
+
+        //     if (!this.isExpanded) {
+        //         this.expand(panel.icon);
+        //         // this.panels[this.visiblePanel].hide();
+        //     }
+
+        //     // this.expand(panel.icon);
+        // },
+
+        // handlePanelHide: function (event, panel) {
+
+        //     if (this.isExpanded) {
+        //         this.collapse();
+        //         // this.panels[this.visiblePanel].hide();
+        //     }
+
+        //     // this.expand(panel.icon);
+        // }
     });
 };
