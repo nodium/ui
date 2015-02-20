@@ -154,9 +154,6 @@ module.exports = function (Nodium, $, _, undefined) {
                     other:     otherId
                 });
             }, this);
-
-            console.log('keyed edges');
-            console.log(edges);
         },
 
         show: function () {
@@ -174,7 +171,6 @@ module.exports = function (Nodium, $, _, undefined) {
 
         unset: function (data, type) {
 
-            console.log('unsetting data: ' + type);
             var update = new model.Update();
 
             if (type === 'label') {
@@ -211,10 +207,6 @@ module.exports = function (Nodium, $, _, undefined) {
         },
 
         parseEdge: function (edge) {
-
-            console.log('parsing edge');
-            console.log(edge);
-            console.log(this.nodeData);
 
             if (!this.nodeData) {
                 return;
@@ -374,13 +366,8 @@ module.exports = function (Nodium, $, _, undefined) {
                 nodeId = Node.getId(this.nodeData),
                 otherId = data[0].data.nodeid;
 
-            console.log('trying delete edge');
-            console.log(data);
-
             // delete the edge from the nodeEdges
             this.nodeEdges.forEach(function (edge, i) {
-
-                console.log(edge);
 
                 sourceId = Node.getId(edge.source);
                 targetId = Node.getId(edge.target);
@@ -388,8 +375,6 @@ module.exports = function (Nodium, $, _, undefined) {
                 if (nodeId == sourceId && otherId == targetId ||
                     nodeId == targetId && otherId == sourceId) {
 
-                    console.log('edge');
-                    console.log(edge);
                     this.nodeEdges.splice(i, 1);
                     $(this.kernel).trigger(EdgeEvent.DESTROY, [edge.source, edge.target]);
                 }
@@ -419,9 +404,6 @@ module.exports = function (Nodium, $, _, undefined) {
         handleEdgeCreated: function (event, edge, source, target) {
 
             // TODO make nice check or remove event handlers
-            console.log('edge created');
-            console.log(this.nodeData);
-            console.log(source);
             if (!this.nodeData || (this.nodeData._id !== source._id && this.nodeData._id !== target._id)) {
                 return;
             }
