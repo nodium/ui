@@ -1,5 +1,5 @@
 /**
- * This file is part of the Nodium core package
+ * This file is part of the Nodium UI package
  *
  * (c) Niko van Meurs & Sid Mijnders
  *
@@ -21,7 +21,7 @@ module.exports = function (Nodium, $, _, undefined) {
 
     ui.NodeEditPanel = Nodium.createView({
 
-        icon: 'icon-pencil',
+        icon: 'fa-pencil',
         title: 'Node Editor',
 
         getInitialState: function () {
@@ -43,6 +43,22 @@ module.exports = function (Nodium, $, _, undefined) {
                             value: 'Event naam'
                         })
                     ])
+                ]),
+                dom('section.panel-section', [
+                    dom('h2.heading.panel-heading.heading--secondary.icon--noIcon', [
+                        'Properties'
+                    ])
+                ]),
+                dom('section.panel-section', [
+                    dom('h2.heading.panel-heading.heading--secondary.icon--noIcon', [
+                        'Connections'
+                    ])
+                ]),
+                dom('button.button.panel-button.button--delete', {
+                    type: 'button'
+                }, [
+                    dom('i.icon.fa.fa-trash-o'),
+                    'Delete node'
                 ])
             ]);
         }

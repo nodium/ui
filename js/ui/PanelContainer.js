@@ -1,5 +1,5 @@
 /**
- * This file is part of the Nodium core package
+ * This file is part of the Nodium UI package
  *
  * (c) Niko van Meurs & Sid Mijnders
  *
@@ -22,47 +22,33 @@ module.exports = function (Nodium, $, undefined) {
     //     };
 
     var ui      = Nodium.ui,
-        dom     = require('mercury').h,
-        value   = require('mercury').value;
+        mercury = require('mercury'),
+        dom     = mercury.h,
+        value   = mercury.value;
 
     ui.PanelContainer = Nodium.createView({
 
         getInitialState: function () {
             return {
-                expandedPanel: value(undefined),
+                channels: {
+                    expand: expand,
+                    collapse: collapse
+                },
+                expandedPanel: value(''),
                 panels:        value([])
             }
         },
 
         render: function (state) {
 
-            var currentPanel,
-                cx;
-
-            console.log(state);
-
-            currentPanel = state.currentPanel;
-
-            cx = Nodium.classSet({
-                'panelContainer':           true,
-                'panelContainer--floating': true,
-                'panelContainer--right':    true,
-                'menu':                     true,
-                'is-expanded':              null != currentPanel,
-                'is-collapsed':             null == currentPanel
-            });
-
-            return dom('div', {
-                    className: cx
+            return dom('aside', {
+                    className: getClassSet(state),
+                    'ev-keydown': mercury.sendKey(state.channels.collapse, 27) // escape
                 },
-                state.panels.map(function (Panel) {
-
-                    var panelState = Panel({
-                        isActive: Panel.title === state.expandedPanel
-                    });
-
-                    return Panel.render(panelState);
-                })
+                [
+                    renderTabBar(state),
+                    renderPanels(state)
+                ]
             );
         },
 
@@ -91,66 +77,6 @@ module.exports = function (Nodium, $, undefined) {
 
         // },
 
-        // addPanel: function (panel) {
-
-        //     this.createMenuItem(panel.icon);
-        //     this.panels[panel.icon] = panel;
-
-        //     panel.init(this);
-
-        //     return this;
-        // },
-
-        // removePanel: function (panel) {
-        //     var index = this.panels.indexOf(panel);
-
-        //     if (index === -1) {
-        //         throw new Error('Could not remove panel.');
-        //         return;
-        //     }
-
-        //     this.panels.splice(index, 1);
-        //     $('.panel-navigation .' + panel.icon, this.view).remove();
-
-        //     panel.destroy();
-
-        //     return this;
-        // },
-
-        // expand: function (icon) {
-        //     // $(this).trigger('expand', []);
-        //     this.visiblePanel = icon;
-        //     this.panels[icon].show();
-
-        //     if (!this.isExpanded) {
-        //         this.view.addClass('expanded');
-        //     }
-
-        //     this.isExpanded = true;
-        // },
-
-        // collapse: function () {
-
-        //     if (this.isExpanded) {
-        //         this.view.removeClass('expanded');
-        //         $(this).trigger('menu-collapse');
-        //     }
-
-        //     this.isExpanded = false;
-        // },
-
-        // createMenuItem: function (icon) {
-
-        //     var menu = $('.panel-navigation', this.view),
-        //         menuItem;
-
-        //     menuItem = util.createFromPrototype(menu, {
-        //         icon: icon
-        //     });
-
-        //     menu.append(menuItem);
-        // },
-
         // /**
         //  * Event Handlers
         //  */
@@ -161,30 +87,60 @@ module.exports = function (Nodium, $, undefined) {
         //         this.collapse();
         //     }
         // },
-
-        // handleMenuButtonClicked: function (event) {
-
-        //     this.expand(event.currentTarget.className);
-        // },
-
-        // handlePanelShow: function (event, panel) {
-
-        //     if (!this.isExpanded) {
-        //         this.expand(panel.icon);
-        //         // this.panels[this.visiblePanel].hide();
-        //     }
-
-        //     // this.expand(panel.icon);
-        // },
-
-        // handlePanelHide: function (event, panel) {
-
-        //     if (this.isExpanded) {
-        //         this.collapse();
-        //         // this.panels[this.visiblePanel].hide();
-        //     }
-
-        //     // this.expand(panel.icon);
-        // }
     });
+
+    function expand (state, data) {
+
+        state.expandedPanel.set(data.panelTitle);
+    }
+
+    function collapse (state) {
+
+        state.expandedPanel.set('');
+    }
+
+    function getClassSet (state) {
+
+        var isExpanded = state.expandedPanel.length;
+
+        return Nodium.classSet({
+            'panelContainer':           true,
+            'panelContainer--floating': true,
+            'panelContainer--right':    true,
+            'menu':                     true,
+            'is-expanded':              isExpanded,
+            'is-collapsed':             !isExpanded
+        });
+    }
+
+    function renderPanels (state) {
+
+        return state.panels.map(function (Panel) {
+
+            var panelState = Panel({
+                isActive: Panel.title === state.expandedPanel
+            });
+
+            return Panel.render(panelState);
+        });
+    }
+
+    function renderTabBar (state) {
+
+        return dom('nav.navigation.tabBar.panelContainer-tabBar',
+
+            state.panels.map(function (Panel) {
+
+                return dom('button.button.button--transparent.menu-item.u-row', {
+                        'ev-click': mercury.send(state.channels.expand, {
+                            panelTitle: Panel.title
+                        })
+                    },
+                    [
+                        dom('i', { className: 'icon fa ' + Panel.icon })
+                    ]
+                )
+            })
+        );
+    }
 };

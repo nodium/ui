@@ -689,7 +689,7 @@ module.exports = function (Nodium, $, undefined) {
 
 },{}],6:[function(require,module,exports){
 /**
- * This file is part of the Nodium core package
+ * This file is part of the Nodium UI package
  *
  * (c) Niko van Meurs & Sid Mijnders
  *
@@ -711,7 +711,7 @@ module.exports = function (Nodium, $, _, undefined) {
 
     ui.NodeEditPanel = Nodium.createView({
 
-        icon: 'icon-pencil',
+        icon: 'fa-pencil',
         title: 'Node Editor',
 
         getInitialState: function () {
@@ -722,27 +722,46 @@ module.exports = function (Nodium, $, _, undefined) {
 
         render: function (state) {
 
-            var cx = Nodium.classSet({
-                'panel': true,
-                'tab':   true,
-                'is-active': state.isActive
-            });
-
             return dom('div', {
-                className: cx
+                className: getClassSet(state)
             }, [
-                dom('header.header', [
+                dom('header.header.panel-header', [
                     dom('label.label.panel-label.fa.fa-pencil.u-box-row', [
-                        dom('input.panel-input.input--header.u-box-col', {
+                        dom('input.input.panel-input.input--header.u-box-col', {
                             type: 'text',
                             placeholder: 'Edit',
                             value: 'Event naam'
                         })
                     ])
+                ]),
+                dom('section.panel-section', [
+                    dom('h2.heading.panel-heading.heading--secondary.icon--noIcon', [
+                        'Properties'
+                    ])
+                ]),
+                dom('section.panel-section', [
+                    dom('h2.heading.panel-heading.heading--secondary.icon--noIcon', [
+                        'Connections'
+                    ])
+                ]),
+                dom('button.button.panel-button.button--delete', {
+                    type: 'button'
+                }, [
+                    dom('i.icon.fa.fa-trash-o'),
+                    'Delete node'
                 ])
             ]);
         }
     });
+
+    function getClassSet (state) {
+
+        return Nodium.classSet({
+            'panel': true,
+            'tab':   true,
+            'is-active': state.isActive
+        });
+    }
 
     // var ui          = Nodium.ui,
     //     Event       = Nodium.event.Event,
@@ -1453,7 +1472,7 @@ module.exports = function (Nodium, $, _, undefined) {
 
 },{}],9:[function(require,module,exports){
 /**
- * This file is part of the Nodium core package
+ * This file is part of the Nodium UI package
  *
  * (c) Niko van Meurs & Sid Mijnders
  *
@@ -1476,49 +1495,33 @@ module.exports = function (Nodium, $, undefined) {
     //     };
 
     var ui      = Nodium.ui,
-        dom     = require('mercury').h,
-        value   = require('mercury').value;
+        mercury = require('mercury'),
+        dom     = mercury.h,
+        value   = mercury.value;
 
     ui.PanelContainer = Nodium.createView({
 
         getInitialState: function () {
             return {
-                expandedPanel: value(undefined),
+                channels: {
+                    expand: expand,
+                    collapse: collapse
+                },
+                expandedPanel: value(''),
                 panels:        value([])
             }
         },
 
         render: function (state) {
 
-            var currentPanel,
-                cx;
-
-            console.log(state);
-
-            currentPanel = state.currentPanel;
-
-            cx = Nodium.classSet({
-                'panelContainer':           true,
-                'panelContainer--floating': true,
-                'panelContainer--right':    true,
-                'menu':                     true,
-                'is-expanded':              null != currentPanel,
-                'is-collapsed':             null == currentPanel
-            });
-
-            return dom(
-                'div',
-                {
-                    className: cx
+            return dom('aside', {
+                    className: getClassSet(state),
+                    'ev-keydown': mercury.sendKey(state.channels.collapse, 27) // escape
                 },
-                state.panels.map(function (Panel) {
-
-                    var panelState = Panel({
-                        isActive: Panel.title === state.expandedPanel
-                    });
-
-                    return Panel.render(panelState);
-                })
+                [
+                    renderTabBar(state),
+                    renderPanels(state)
+                ]
             );
         },
 
@@ -1547,66 +1550,6 @@ module.exports = function (Nodium, $, undefined) {
 
         // },
 
-        // addPanel: function (panel) {
-
-        //     this.createMenuItem(panel.icon);
-        //     this.panels[panel.icon] = panel;
-
-        //     panel.init(this);
-
-        //     return this;
-        // },
-
-        // removePanel: function (panel) {
-        //     var index = this.panels.indexOf(panel);
-
-        //     if (index === -1) {
-        //         throw new Error('Could not remove panel.');
-        //         return;
-        //     }
-
-        //     this.panels.splice(index, 1);
-        //     $('.panel-navigation .' + panel.icon, this.view).remove();
-
-        //     panel.destroy();
-
-        //     return this;
-        // },
-
-        // expand: function (icon) {
-        //     // $(this).trigger('expand', []);
-        //     this.visiblePanel = icon;
-        //     this.panels[icon].show();
-
-        //     if (!this.isExpanded) {
-        //         this.view.addClass('expanded');
-        //     }
-
-        //     this.isExpanded = true;
-        // },
-
-        // collapse: function () {
-
-        //     if (this.isExpanded) {
-        //         this.view.removeClass('expanded');
-        //         $(this).trigger('menu-collapse');
-        //     }
-
-        //     this.isExpanded = false;
-        // },
-
-        // createMenuItem: function (icon) {
-
-        //     var menu = $('.panel-navigation', this.view),
-        //         menuItem;
-
-        //     menuItem = util.createFromPrototype(menu, {
-        //         icon: icon
-        //     });
-
-        //     menu.append(menuItem);
-        // },
-
         // /**
         //  * Event Handlers
         //  */
@@ -1617,33 +1560,64 @@ module.exports = function (Nodium, $, undefined) {
         //         this.collapse();
         //     }
         // },
-
-        // handleMenuButtonClicked: function (event) {
-
-        //     this.expand(event.currentTarget.className);
-        // },
-
-        // handlePanelShow: function (event, panel) {
-
-        //     if (!this.isExpanded) {
-        //         this.expand(panel.icon);
-        //         // this.panels[this.visiblePanel].hide();
-        //     }
-
-        //     // this.expand(panel.icon);
-        // },
-
-        // handlePanelHide: function (event, panel) {
-
-        //     if (this.isExpanded) {
-        //         this.collapse();
-        //         // this.panels[this.visiblePanel].hide();
-        //     }
-
-        //     // this.expand(panel.icon);
-        // }
     });
+
+    function expand (state, data) {
+
+        state.expandedPanel.set(data.panelTitle);
+    }
+
+    function collapse (state) {
+
+        state.expandedPanel.set('');
+    }
+
+    function getClassSet (state) {
+
+        var isExpanded = state.expandedPanel.length;
+
+        return Nodium.classSet({
+            'panelContainer':           true,
+            'panelContainer--floating': true,
+            'panelContainer--right':    true,
+            'menu':                     true,
+            'is-expanded':              isExpanded,
+            'is-collapsed':             !isExpanded
+        });
+    }
+
+    function renderPanels (state) {
+
+        return state.panels.map(function (Panel) {
+
+            var panelState = Panel({
+                isActive: Panel.title === state.expandedPanel
+            });
+
+            return Panel.render(panelState);
+        });
+    }
+
+    function renderTabBar (state) {
+
+        return dom('nav.navigation.tabBar.panelContainer-tabBar',
+
+            state.panels.map(function (Panel) {
+
+                return dom('button.button.button--transparent.menu-item.u-row', {
+                        'ev-click': mercury.send(state.channels.expand, {
+                            panelTitle: Panel.title
+                        })
+                    },
+                    [
+                        dom('i', { className: 'icon fa ' + Panel.icon })
+                    ]
+                )
+            })
+        );
+    }
 };
+
 },{"mercury":17}],10:[function(require,module,exports){
 /**
  * This file is part of the Nodium core package
@@ -1794,51 +1768,86 @@ module.exports = function (Nodium) {
     }
 };
 },{}],13:[function(require,module,exports){
+/**
+ * This file is part of the Nodium UI package
+ *
+ * (c) Niko van Meurs & Sid Mijnders
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+/**
+ * @author Niko van Meurs <nikovanmeurs@gmail.com>
+ * @author Sid Mijnders
+ */
 module.exports = function (Nodium) {
 
     'use strict';
 
     var _ = Nodium.context._,
-    	mercury = require('mercury');
+        mercury = require('mercury');
 
     Nodium.createView = function (object) {
 
         // inject any sane defaults here
         var defaults,
-        	Component;
+            Component;
 
         defaults = {
             getInitialState: function () { return {} }
         };
 
-        Component = function (options) {
+        Component = function (options, kernel) {
 
-        	return mercury.state(_.merge({}, defaults, object.getInitialState(), options));
+            var state = _.chain({})
+                .merge(defaults, object.getInitialState(), options)
+                .forIn(function (value, key) {
+                    value = mercury.value(value)
+                })
+                .value();
+
+            return mercury.state(state);
         };
 
         _.forIn(object, function (value, key) {
-        	Component[key] = value;
+            Component[key] = value;
         });
 
         return Component;
     };
 };
+
 },{"mercury":17}],14:[function(require,module,exports){
-module.exports = function (Nodium) {
+/**
+ * This file is part of the Nodium UI package
+ *
+ * (c) Niko van Meurs & Sid Mijnders
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+/**
+ * @author Niko van Meurs <nikovanmeurs@gmail.com>
+ * @author Sid Mijnders
+ */
+ module.exports = function (Nodium) {
 
     var mercury = require('mercury');
 
     'use strict';
 
-    Nodium.renderComponent = function (domElement, Component, options) {
+    Nodium.renderComponent = function (domElement, Component, initialState) {
 
         mercury.app(
             domElement,
-            Component(options),
+            Component(initialState),
             Component.render
         );
     };
 };
+
 },{"mercury":17}],15:[function(require,module,exports){
 
 },{}],16:[function(require,module,exports){
