@@ -480,6 +480,10 @@ module.exports = function (Nodium, $, _, undefined) {
          */
         handleGraphLoaded: function (event, nodes, edges) {
 
+            console.log('EDIT PANEL GRAPH LOADED');
+            console.log(nodes);
+            console.log(edges);
+
             this.nodes = nodes;
             this.edges = edges;
             // this.bloodhound.initialize();
