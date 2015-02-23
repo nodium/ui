@@ -62,23 +62,23 @@ module.exports = function (Nodium, $, _, undefined) {
              * Initialization is done when the graph is loaded
              * and reinitialization when a node is updated
              */
-            // this.bloodhound = new Bloodhound({
-            //     name: 'edges',
-            //     local: this.getTypeaheadNodes.bind(this),
-            //     datumTokenizer: function (node) {
-            //         return Bloodhound.tokenizers.whitespace(
-            //             Node.getPropertyValue(node, 'name')
-            //         );
-            //     },
-            //     queryTokenizer: Bloodhound.tokenizers.whitespace
-            // });
+            this.bloodhound = new Bloodhound({
+                name: 'edges',
+                local: this.getTypeaheadNodes.bind(this),
+                datumTokenizer: function (node) {
+                    return Bloodhound.tokenizers.whitespace(
+                        Node.getPropertyValue(node, 'name')
+                    );
+                },
+                queryTokenizer: Bloodhound.tokenizers.whitespace
+            });
 
-            // $('#new-edge').typeahead(null, {
-            //     source:     this.bloodhound.ttAdapter(),
-            //     displayKey: function (node) {
-            //         return Node.getPropertyValue(node, 'name');
-            //     }
-            // });
+            $('#new-edge-target').typeahead(null, {
+                source:     this.bloodhound.ttAdapter(),
+                displayKey: function (node) {
+                    return Node.getPropertyValue(node, 'name');
+                }
+            });
         },
 
         init: function (container) {
@@ -98,13 +98,13 @@ module.exports = function (Nodium, $, _, undefined) {
                 .on(this, '#node-form', Event.FOCUS_OUT, 'input');
 
             this.view.find('#node-form').on('keydown', function (event) { event.keyCode === 13 && event.preventDefault() });
-            this.view.find('#new-edge').on('click', handleCreateEdge.bind(this));
+            this.view.find('#new-edge').on('click', this.handleCreateEdge.bind(this));
 
             $(this.labelList).on('list-delete', this.handleDeleteElement.bind(this, 'label'));
             $(this.propertyList).on('list-delete', this.handleDeleteElement.bind(this, 'property'));
             $(this.edgeList).on('list-delete', this.handleDeleteEdge.bind(this));
             $(this.edgeList).on('list-click', this.handleEdgeElementClicked.bind(this));
-            // $('#new-edge').on('typeahead:selected', this.handleCreateEdge.bind(this));
+            $('#new-edge-target').on('typeahead:selected', this.handleCreateEdge.bind(this));
 
             $('#delete-node-button', this.view).on(Event.CLICK, this.handleDeleteNodeButtonClick.bind(this));
 
@@ -382,7 +382,7 @@ module.exports = function (Nodium, $, _, undefined) {
                     return;
                 }
 
-                endpoint = this.nodes.find(function (node) {
+                endpoint = _.find(this.nodes, function (node) {
                     return endpointName === Node.getPropertyValue('name');
                 });
 
