@@ -1213,7 +1213,7 @@ module.exports = function (Nodium, $, _, undefined) {
 
             this.nodes = nodes;
             this.edges = edges;
-            // this.bloodhound.initialize();
+            this.bloodhound.initialize();
         },
 
         handleNodeSelected: function (event, node, data) {
